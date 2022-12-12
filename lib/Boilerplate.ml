@@ -153,23 +153,21 @@ let map_string_ (env : env) (x : CST.string_) =
 
 let rec map_args (env : env) (x : CST.args) =
   (match x with
-  | `Expr_opt_COMMA_expr_opt_COMMA_named_arg_opt_COMMA (v1, v2, v3, v4) ->
+  | `Expr_rep_COMMA_expr_rep_COMMA_named_arg_opt_COMMA (v1, v2, v3, v4) ->
       let v1 = map_document env v1 in
       let v2 =
-        (match v2 with
-        | Some (v1, v2) ->
-            let v1 = (* "," *) token env v1 in
-            let v2 = map_document env v2 in
-            todo env (v1, v2)
-        | None -> todo env ())
+        List.map (fun (v1, v2) ->
+          let v1 = (* "," *) token env v1 in
+          let v2 = map_document env v2 in
+          todo env (v1, v2)
+        ) v2
       in
       let v3 =
-        (match v3 with
-        | Some (v1, v2) ->
-            let v1 = (* "," *) token env v1 in
-            let v2 = map_named_argument env v2 in
-            todo env (v1, v2)
-        | None -> todo env ())
+        List.map (fun (v1, v2) ->
+          let v1 = (* "," *) token env v1 in
+          let v2 = map_named_argument env v2 in
+          todo env (v1, v2)
+        ) v3
       in
       let v4 =
         (match v4 with
@@ -177,15 +175,14 @@ let rec map_args (env : env) (x : CST.args) =
         | None -> todo env ())
       in
       todo env (v1, v2, v3, v4)
-  | `Named_arg_opt_COMMA_named_arg_opt_COMMA (v1, v2, v3) ->
+  | `Named_arg_rep_COMMA_named_arg_opt_COMMA (v1, v2, v3) ->
       let v1 = map_named_argument env v1 in
       let v2 =
-        (match v2 with
-        | Some (v1, v2) ->
-            let v1 = (* "," *) token env v1 in
-            let v2 = map_named_argument env v2 in
-            todo env (v1, v2)
-        | None -> todo env ())
+        List.map (fun (v1, v2) ->
+          let v1 = (* "," *) token env v1 in
+          let v2 = map_named_argument env v2 in
+          todo env (v1, v2)
+        ) v2
       in
       let v3 =
         (match v3 with

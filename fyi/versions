@@ -1,26 +1,36 @@
 File: semgrep-grammars/src/tree-sitter-jsonnet/LICENSE
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 0475a5017ad7dc84845d1d33187f2321abcb261d
+Latest commit in repo: f4e2d85598cdf43259b68bb396910d3c2b519de3
 Last change in file:
-  commit 0c998eaefd573957c54b7733f0eaee6a15b723f5
-  Author: TJ DeVries <devries.timothyj@gmail.com>
-  Date:   Thu May 19 07:26:08 2022 -0400
+  commit f4e2d85598cdf43259b68bb396910d3c2b519de3
+  Author: pad <pad@r2c.dev>
+  Date:   Thu Dec 8 22:44:44 2022 +0100
   
-      Initial commit
+      Support calls with more than 2 arguments
+      
+      This closes https://github.com/sourcegraph/tree-sitter-jsonnet/issues/5
+      
+      test plan:
+      make test
 ---
 File: semgrep-grammars/src/tree-sitter-jsonnet/grammar.js
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 0475a5017ad7dc84845d1d33187f2321abcb261d
+Latest commit in repo: f4e2d85598cdf43259b68bb396910d3c2b519de3
 Last change in file:
-  commit 009e6f06266f46ae07077dd6c8026ded56ab7dd8
-  Author: TJ DeVries <devries.timothyj@gmail.com>
-  Date:   Fri May 27 01:16:49 2022 -0400
+  commit f4e2d85598cdf43259b68bb396910d3c2b519de3
+  Author: pad <pad@r2c.dev>
+  Date:   Thu Dec 8 22:44:44 2022 +0100
   
-      updates from doing more complicated files
+      Support calls with more than 2 arguments
+      
+      This closes https://github.com/sourcegraph/tree-sitter-jsonnet/issues/5
+      
+      test plan:
+      make test
 ---
 File: semgrep-grammars/src/semgrep-jsonnet/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 8a6a3fc90c51d1de7d8505591f35ba37587d0c4e
+Latest commit in repo: 7438b814fe2fb75a1eb2d138a8ab8d27f4a74435
 Last change in file:
   commit 8a6a3fc90c51d1de7d8505591f35ba37587d0c4e
   Author: pad <pad@r2c.dev>

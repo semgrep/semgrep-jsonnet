@@ -118,15 +118,15 @@ type string_ = [
 [@@deriving sexp_of]
 
 type args = [
-    `Expr_opt_COMMA_expr_opt_COMMA_named_arg_opt_COMMA of (
+    `Expr_rep_COMMA_expr_rep_COMMA_named_arg_opt_COMMA of (
         document
-      * (Token.t (* "," *) * document) option
-      * (Token.t (* "," *) * named_argument) option
+      * (Token.t (* "," *) * document) list (* zero or more *)
+      * (Token.t (* "," *) * named_argument) list (* zero or more *)
       * Token.t (* "," *) option
     )
-  | `Named_arg_opt_COMMA_named_arg_opt_COMMA of (
+  | `Named_arg_rep_COMMA_named_arg_opt_COMMA of (
         named_argument
-      * (Token.t (* "," *) * named_argument) option
+      * (Token.t (* "," *) * named_argument) list (* zero or more *)
       * Token.t (* "," *) option
     )
 ]

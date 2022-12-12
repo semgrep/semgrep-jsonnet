@@ -174,13 +174,13 @@ let children_regexps : (string * Run.exp option) list = [
     Alt [|
       Seq [
         Token (Name "expr");
-        Opt (
+        Repeat (
           Seq [
             Token (Literal ",");
             Token (Name "expr");
           ];
         );
-        Opt (
+        Repeat (
           Seq [
             Token (Literal ",");
             Token (Name "named_argument");
@@ -192,7 +192,7 @@ let children_regexps : (string * Run.exp option) list = [
       ];
       Seq [
         Token (Name "named_argument");
-        Opt (
+        Repeat (
           Seq [
             Token (Literal ",");
             Token (Name "named_argument");
@@ -971,12 +971,12 @@ and trans_args ((kind, body) : mt) : CST.args =
   | Children v ->
       (match v with
       | Alt (0, v) ->
-          `Expr_opt_COMMA_expr_opt_COMMA_named_arg_opt_COMMA (
+          `Expr_rep_COMMA_expr_rep_COMMA_named_arg_opt_COMMA (
             (match v with
             | Seq [v0; v1; v2; v3] ->
                 (
                   trans_expr (Run.matcher_token v0),
-                  Run.opt
+                  Run.repeat
                     (fun v ->
                       (match v with
                       | Seq [v0; v1] ->
@@ -989,7 +989,7 @@ and trans_args ((kind, body) : mt) : CST.args =
                     )
                     v1
                   ,
-                  Run.opt
+                  Run.repeat
                     (fun v ->
                       (match v with
                       | Seq [v0; v1] ->
@@ -1010,12 +1010,12 @@ and trans_args ((kind, body) : mt) : CST.args =
             )
           )
       | Alt (1, v) ->
-          `Named_arg_opt_COMMA_named_arg_opt_COMMA (
+          `Named_arg_rep_COMMA_named_arg_opt_COMMA (
             (match v with
             | Seq [v0; v1; v2] ->
                 (
                   trans_named_argument (Run.matcher_token v0),
-                  Run.opt
+                  Run.repeat
                     (fun v ->
                       (match v with
                       | Seq [v0; v1] ->
