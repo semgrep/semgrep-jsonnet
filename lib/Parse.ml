@@ -33,43 +33,22 @@ let extras = [
 ]
 
 let children_regexps : (string * Run.exp option) list = [
-  "self", None;
-  "string_start", None;
-  "dollar", None;
-  "local", None;
-  "null", None;
-  "binaryop",
-  Some (
-    Alt [|
-      Token (Literal "*");
-      Token (Literal "/");
-      Token (Literal "%");
-      Token (Literal "+");
-      Token (Literal "-");
-      Token (Literal "<<");
-      Token (Literal ">>");
-      Token (Literal "<");
-      Token (Literal "<=");
-      Token (Literal ">");
-      Token (Literal ">=");
-      Token (Literal "==");
-      Token (Literal "!=");
-      Token (Literal "&");
-      Token (Literal "^");
-      Token (Literal "|");
-      Token (Literal "&&");
-      Token (Literal "||");
-    |];
-  );
-  "string_content", None;
-  "number", None;
-  "string_end", None;
-  "super", None;
-  "imm_tok_prec_p1_pat_c7f65b4", None;
-  "id", None;
   "single", None;
-  "escape_sequence", None;
+  "super", None;
+  "double", None;
+  "null", None;
+  "number", None;
+  "id", None;
+  "string_end", None;
+  "dollar", None;
+  "string_start", None;
+  "tailstrict", None;
+  "imm_tok_prec_p1_pat_59587ce", None;
+  "local", None;
+  "self", None;
+  "false", None;
   "true", None;
+  "string_content", None;
   "unaryop",
   Some (
     Alt [|
@@ -79,23 +58,22 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "~");
     |];
   );
-  "double", None;
-  "imm_tok_prec_p1_pat_59587ce", None;
-  "false", None;
-  "str_double",
-  Some (
-    Repeat1 (
-      Alt [|
-        Token (Name "imm_tok_prec_p1_pat_c7f65b4");
-        Token (Name "escape_sequence");
-      |];
-    );
-  );
+  "escape_sequence", None;
+  "imm_tok_prec_p1_pat_c7f65b4", None;
   "str_single",
   Some (
     Repeat1 (
       Alt [|
         Token (Name "imm_tok_prec_p1_pat_59587ce");
+        Token (Name "escape_sequence");
+      |];
+    );
+  );
+  "str_double",
+  Some (
+    Repeat1 (
+      Alt [|
+        Token (Name "imm_tok_prec_p1_pat_c7f65b4");
         Token (Name "escape_sequence");
       |];
     );
@@ -143,17 +121,17 @@ let children_regexps : (string * Run.exp option) list = [
       ];
     |];
   );
-  "import",
-  Some (
-    Seq [
-      Token (Literal "import");
-      Token (Name "string");
-    ];
-  );
   "importstr",
   Some (
     Seq [
       Token (Literal "importstr");
+      Token (Name "string");
+    ];
+  );
+  "import",
+  Some (
+    Seq [
+      Token (Literal "import");
       Token (Name "string");
     ];
   );
@@ -217,6 +195,79 @@ let children_regexps : (string * Run.exp option) list = [
       );
     ];
   );
+  "binary_expr",
+  Some (
+    Alt [|
+      Seq [
+        Token (Name "expr");
+        Alt [|
+          Token (Literal "*");
+          Token (Literal "/");
+          Token (Literal "%");
+        |];
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Alt [|
+          Token (Literal "+");
+          Token (Literal "-");
+        |];
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Alt [|
+          Token (Literal "<<");
+          Token (Literal ">>");
+        |];
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Alt [|
+          Token (Literal "<");
+          Token (Literal "<=");
+          Token (Literal ">");
+          Token (Literal ">=");
+        |];
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Alt [|
+          Token (Literal "==");
+          Token (Literal "!=");
+        |];
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Token (Literal "&");
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Token (Literal "^");
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Token (Literal "|");
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Token (Literal "&&");
+        Token (Name "expr");
+      ];
+      Seq [
+        Token (Name "expr");
+        Token (Literal "||");
+        Token (Name "expr");
+      ];
+    |];
+  );
   "bind",
   Some (
     Alt [|
@@ -254,9 +305,8 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "false");
       Token (Name "self");
       Token (Name "dollar");
-      Token (Name "number");
-      Token (Name "super");
       Token (Name "string");
+      Token (Name "number");
       Seq [
         Token (Literal "{");
         Opt (
@@ -380,6 +430,9 @@ let children_regexps : (string * Run.exp option) list = [
           Token (Name "args");
         );
         Token (Literal ")");
+        Opt (
+          Token (Name "tailstrict");
+        );
       ];
       Token (Name "id");
       Token (Name "local_bind");
@@ -395,11 +448,7 @@ let children_regexps : (string * Run.exp option) list = [
           ];
         );
       ];
-      Seq [
-        Token (Name "expr");
-        Token (Name "binaryop");
-        Token (Name "expr");
-      ];
+      Token (Name "binary_expr");
       Seq [
         Token (Name "unaryop");
         Token (Name "expr");
@@ -604,123 +653,7 @@ let children_regexps : (string * Run.exp option) list = [
   "document", Some (Token (Name "expr"););
 ]
 
-let trans_self ((kind, body) : mt) : CST.self =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_string_start ((kind, body) : mt) : CST.string_start =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_dollar ((kind, body) : mt) : CST.dollar =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_local ((kind, body) : mt) : CST.local =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_null ((kind, body) : mt) : CST.null =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-
-let trans_binaryop ((kind, body) : mt) : CST.binaryop =
-  match body with
-  | Children v ->
-      (match v with
-      | Alt (0, v) ->
-          `STAR (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (1, v) ->
-          `SLASH (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (2, v) ->
-          `PERC (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (3, v) ->
-          `PLUS (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (4, v) ->
-          `DASH (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (5, v) ->
-          `LTLT (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (6, v) ->
-          `GTGT (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (7, v) ->
-          `LT (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (8, v) ->
-          `LTEQ (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (9, v) ->
-          `GT (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (10, v) ->
-          `GTEQ (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (11, v) ->
-          `EQEQ (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (12, v) ->
-          `BANGEQ (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (13, v) ->
-          `AMP (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (14, v) ->
-          `HAT (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (15, v) ->
-          `BAR (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (16, v) ->
-          `AMPAMP (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | Alt (17, v) ->
-          `BARBAR (
-            Run.trans_token (Run.matcher_token v)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-let trans_string_content ((kind, body) : mt) : CST.string_content =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_number ((kind, body) : mt) : CST.number =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_string_end ((kind, body) : mt) : CST.string_end =
+let trans_single ((kind, body) : mt) : CST.single =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -730,7 +663,17 @@ let trans_super ((kind, body) : mt) : CST.super =
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_imm_tok_prec_p1_pat_c7f65b4 ((kind, body) : mt) : CST.imm_tok_prec_p1_pat_c7f65b4 =
+let trans_double ((kind, body) : mt) : CST.double =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_null ((kind, body) : mt) : CST.null =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_number ((kind, body) : mt) : CST.number =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -740,17 +683,53 @@ let trans_id ((kind, body) : mt) : CST.id =
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_single ((kind, body) : mt) : CST.single =
+
+let trans_string_end ((kind, body) : mt) : CST.string_end =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_escape_sequence ((kind, body) : mt) : CST.escape_sequence =
+let trans_dollar ((kind, body) : mt) : CST.dollar =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_string_start ((kind, body) : mt) : CST.string_start =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_tailstrict ((kind, body) : mt) : CST.tailstrict =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_imm_tok_prec_p1_pat_59587ce ((kind, body) : mt) : CST.imm_tok_prec_p1_pat_59587ce =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_local ((kind, body) : mt) : CST.local =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_self ((kind, body) : mt) : CST.self =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_false_ ((kind, body) : mt) : CST.false_ =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
 let trans_true_ ((kind, body) : mt) : CST.true_ =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_string_content ((kind, body) : mt) : CST.string_content =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -779,31 +758,26 @@ let trans_unaryop ((kind, body) : mt) : CST.unaryop =
       )
   | Leaf _ -> assert false
 
-let trans_double ((kind, body) : mt) : CST.double =
+let trans_escape_sequence ((kind, body) : mt) : CST.escape_sequence =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_imm_tok_prec_p1_pat_59587ce ((kind, body) : mt) : CST.imm_tok_prec_p1_pat_59587ce =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_false_ ((kind, body) : mt) : CST.false_ =
+let trans_imm_tok_prec_p1_pat_c7f65b4 ((kind, body) : mt) : CST.imm_tok_prec_p1_pat_c7f65b4 =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
 
-let trans_str_double ((kind, body) : mt) : CST.str_double =
+let trans_str_single ((kind, body) : mt) : CST.str_single =
   match body with
   | Children v ->
       Run.repeat1
         (fun v ->
           (match v with
           | Alt (0, v) ->
-              `Imm_tok_prec_p1_pat_c7f65b4 (
-                trans_imm_tok_prec_p1_pat_c7f65b4 (Run.matcher_token v)
+              `Imm_tok_prec_p1_pat_59587ce (
+                trans_imm_tok_prec_p1_pat_59587ce (Run.matcher_token v)
               )
           | Alt (1, v) ->
               `Esc_seq (
@@ -815,15 +789,15 @@ let trans_str_double ((kind, body) : mt) : CST.str_double =
         v
   | Leaf _ -> assert false
 
-let trans_str_single ((kind, body) : mt) : CST.str_single =
+let trans_str_double ((kind, body) : mt) : CST.str_double =
   match body with
   | Children v ->
       Run.repeat1
         (fun v ->
           (match v with
           | Alt (0, v) ->
-              `Imm_tok_prec_p1_pat_59587ce (
-                trans_imm_tok_prec_p1_pat_59587ce (Run.matcher_token v)
+              `Imm_tok_prec_p1_pat_c7f65b4 (
+                trans_imm_tok_prec_p1_pat_c7f65b4 (Run.matcher_token v)
               )
           | Alt (1, v) ->
               `Esc_seq (
@@ -921,7 +895,7 @@ let trans_string_ ((kind, body) : mt) : CST.string_ =
       )
   | Leaf _ -> assert false
 
-let trans_import ((kind, body) : mt) : CST.import =
+let trans_importstr ((kind, body) : mt) : CST.importstr =
   match body with
   | Children v ->
       (match v with
@@ -934,7 +908,7 @@ let trans_import ((kind, body) : mt) : CST.import =
       )
   | Leaf _ -> assert false
 
-let trans_importstr ((kind, body) : mt) : CST.importstr =
+let trans_import ((kind, body) : mt) : CST.import =
   match body with
   | Children v ->
       (match v with
@@ -1064,6 +1038,201 @@ and trans_assert_ ((kind, body) : mt) : CST.assert_ =
       )
   | Leaf _ -> assert false
 
+and trans_binary_expr ((kind, body) : mt) : CST.binary_expr =
+  match body with
+  | Children v ->
+      (match v with
+      | Alt (0, v) ->
+          `Expr_choice_STAR_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  (match v1 with
+                  | Alt (0, v) ->
+                      `STAR (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (1, v) ->
+                      `SLASH (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (2, v) ->
+                      `PERC (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | _ -> assert false
+                  )
+                  ,
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (1, v) ->
+          `Expr_choice_PLUS_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  (match v1 with
+                  | Alt (0, v) ->
+                      `PLUS (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (1, v) ->
+                      `DASH (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | _ -> assert false
+                  )
+                  ,
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (2, v) ->
+          `Expr_choice_LTLT_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  (match v1 with
+                  | Alt (0, v) ->
+                      `LTLT (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (1, v) ->
+                      `GTGT (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | _ -> assert false
+                  )
+                  ,
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (3, v) ->
+          `Expr_choice_LT_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  (match v1 with
+                  | Alt (0, v) ->
+                      `LT (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (1, v) ->
+                      `LTEQ (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (2, v) ->
+                      `GT (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (3, v) ->
+                      `GTEQ (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | _ -> assert false
+                  )
+                  ,
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (4, v) ->
+          `Expr_choice_EQEQ_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  (match v1 with
+                  | Alt (0, v) ->
+                      `EQEQ (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | Alt (1, v) ->
+                      `BANGEQ (
+                        Run.trans_token (Run.matcher_token v)
+                      )
+                  | _ -> assert false
+                  )
+                  ,
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (5, v) ->
+          `Expr_AMP_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1),
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (6, v) ->
+          `Expr_HAT_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1),
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (7, v) ->
+          `Expr_BAR_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1),
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (8, v) ->
+          `Expr_AMPAMP_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1),
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (9, v) ->
+          `Expr_BARBAR_expr (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  trans_expr (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1),
+                  trans_expr (Run.matcher_token v2)
+                )
+            | _ -> assert false
+            )
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
 and trans_bind ((kind, body) : mt) : CST.bind =
   match body with
   | Children v ->
@@ -1147,18 +1316,14 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             trans_dollar (Run.matcher_token v)
           )
       | Alt (5, v) ->
-          `Num (
-            trans_number (Run.matcher_token v)
-          )
-      | Alt (6, v) ->
-          `Super (
-            trans_super (Run.matcher_token v)
-          )
-      | Alt (7, v) ->
           `Str (
             trans_string_ (Run.matcher_token v)
           )
-      | Alt (8, v) ->
+      | Alt (6, v) ->
+          `Num (
+            trans_number (Run.matcher_token v)
+          )
+      | Alt (7, v) ->
           `LCURL_opt_choice_member_rep_COMMA_member_opt_COMMA_RCURL (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1251,7 +1416,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (9, v) ->
+      | Alt (8, v) ->
           `LBRACK_opt_expr_rep_COMMA_expr_opt_COMMA_RBRACK (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1290,7 +1455,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (10, v) ->
+      | Alt (9, v) ->
           `LBRACK_expr_opt_COMMA_fors_opt_comp_RBRACK (
             (match v with
             | Seq [v0; v1; v2; v3; v4; v5] ->
@@ -1311,7 +1476,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (11, v) ->
+      | Alt (10, v) ->
           `Expr_DOT_id (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1323,7 +1488,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (12, v) ->
+      | Alt (11, v) ->
           `Expr_LBRACK_opt_expr_opt_COLON_opt_expr_opt_COLON_opt_expr_RBRACK (
             (match v with
             | Seq [v0; v1; v2; v3; v4] ->
@@ -1369,7 +1534,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (13, v) ->
+      | Alt (12, v) ->
           `Super_DOT_id (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1381,7 +1546,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (14, v) ->
+      | Alt (13, v) ->
           `Super_LBRACK_expr_RBRACK (
             (match v with
             | Seq [v0; v1; v2; v3] ->
@@ -1394,10 +1559,10 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (15, v) ->
-          `Expr_LPAR_opt_args_RPAR (
+      | Alt (14, v) ->
+          `Expr_LPAR_opt_args_RPAR_opt_tail (
             (match v with
-            | Seq [v0; v1; v2; v3] ->
+            | Seq [v0; v1; v2; v3; v4] ->
                 (
                   trans_expr (Run.matcher_token v0),
                   Run.trans_token (Run.matcher_token v1),
@@ -1405,20 +1570,23 @@ and trans_expr ((kind, body) : mt) : CST.expr =
                     (fun v -> trans_args (Run.matcher_token v))
                     v2
                   ,
-                  Run.trans_token (Run.matcher_token v3)
+                  Run.trans_token (Run.matcher_token v3),
+                  Run.opt
+                    (fun v -> trans_tailstrict (Run.matcher_token v))
+                    v4
                 )
             | _ -> assert false
             )
           )
-      | Alt (16, v) ->
+      | Alt (15, v) ->
           `Id (
             trans_id (Run.matcher_token v)
           )
-      | Alt (17, v) ->
+      | Alt (16, v) ->
           `Local_bind (
             trans_local_bind (Run.matcher_token v)
           )
-      | Alt (18, v) ->
+      | Alt (17, v) ->
           `If_expr_then_expr_opt_else_expr (
             (match v with
             | Seq [v0; v1; v2; v3; v4] ->
@@ -1443,19 +1611,11 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (19, v) ->
-          `Expr_bina_expr (
-            (match v with
-            | Seq [v0; v1; v2] ->
-                (
-                  trans_expr (Run.matcher_token v0),
-                  trans_binaryop (Run.matcher_token v1),
-                  trans_expr (Run.matcher_token v2)
-                )
-            | _ -> assert false
-            )
+      | Alt (18, v) ->
+          `Bin_expr (
+            trans_binary_expr (Run.matcher_token v)
           )
-      | Alt (20, v) ->
+      | Alt (19, v) ->
           `Unar_expr (
             (match v with
             | Seq [v0; v1] ->
@@ -1466,7 +1626,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (21, v) ->
+      | Alt (20, v) ->
           `Expr_LCURL_choice_member_rep_COMMA_member_opt_COMMA_RCURL (
             (match v with
             | Seq [v0; v1; v2; v3] ->
@@ -1556,11 +1716,11 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (22, v) ->
+      | Alt (21, v) ->
           `Anon_func (
             trans_anonymous_function (Run.matcher_token v)
           )
-      | Alt (23, v) ->
+      | Alt (22, v) ->
           `Assert_SEMI_expr (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1572,19 +1732,19 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (24, v) ->
+      | Alt (23, v) ->
           `Import (
             trans_import (Run.matcher_token v)
           )
-      | Alt (25, v) ->
+      | Alt (24, v) ->
           `Impo (
             trans_importstr (Run.matcher_token v)
           )
-      | Alt (26, v) ->
+      | Alt (25, v) ->
           `Expr_error (
             trans_expr_error (Run.matcher_token v)
           )
-      | Alt (27, v) ->
+      | Alt (26, v) ->
           `Expr_in_super (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1596,7 +1756,7 @@ and trans_expr ((kind, body) : mt) : CST.expr =
             | _ -> assert false
             )
           )
-      | Alt (28, v) ->
+      | Alt (27, v) ->
           `LPAR_expr_RPAR (
             (match v with
             | Seq [v0; v1; v2] ->
@@ -1880,12 +2040,12 @@ and trans_params ((kind, body) : mt) : CST.params =
       )
   | Leaf _ -> assert false
 
+
 let trans_document ((kind, body) : mt) : CST.document =
   match body with
   | Children v ->
       trans_expr (Run.matcher_token v)
   | Leaf _ -> assert false
-
 
 let parse_input_tree input_tree =
   let orig_root_node = Tree_sitter_parsing.root input_tree in

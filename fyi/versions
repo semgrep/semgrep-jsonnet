@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-jsonnet/LICENSE
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: f4e2d85598cdf43259b68bb396910d3c2b519de3
+Latest commit in repo: 768a384989391237c6d55ff3d878a0d1e0d2b4fa
 Last change in file:
   commit f4e2d85598cdf43259b68bb396910d3c2b519de3
   Author: pad <pad@r2c.dev>
@@ -15,22 +15,22 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-jsonnet/grammar.js
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: f4e2d85598cdf43259b68bb396910d3c2b519de3
+Latest commit in repo: 768a384989391237c6d55ff3d878a0d1e0d2b4fa
 Last change in file:
-  commit f4e2d85598cdf43259b68bb396910d3c2b519de3
-  Author: pad <pad@r2c.dev>
-  Date:   Thu Dec 8 22:44:44 2022 +0100
+  commit 768a384989391237c6d55ff3d878a0d1e0d2b4fa
+  Author: Yoann Padioleau <pad@r2c.dev>
+  Date:   Tue Dec 13 17:25:22 2022 +0100
   
-      Support calls with more than 2 arguments
+      Fix operator precedence (#10)
       
-      This closes https://github.com/sourcegraph/tree-sitter-jsonnet/issues/5
+      Followed the official spec for the precedence values.
       
       test plan:
       make test
 ---
 File: semgrep-grammars/src/semgrep-jsonnet/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 7438b814fe2fb75a1eb2d138a8ab8d27f4a74435
+Latest commit in repo: 386845ed490c63ab666dcbc27c5d27cb877dfe84
 Last change in file:
   commit 8a6a3fc90c51d1de7d8505591f35ba37587d0c4e
   Author: pad <pad@r2c.dev>

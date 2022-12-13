@@ -20,39 +20,17 @@ let blank (env : env) () =
 let todo (env : env) _ =
    failwith "not implemented"
 
+let map_escape_sequence (env : env) (tok : CST.escape_sequence) =
+  (* escape_sequence *) token env tok
+
 let map_number (env : env) (tok : CST.number) =
   (* number *) token env tok
 
-let map_id (env : env) (tok : CST.id) =
-  (* pattern [_a-zA-Z][_a-zA-Z0-9]* *) token env tok
+let map_imm_tok_prec_p1_pat_59587ce (env : env) (tok : CST.imm_tok_prec_p1_pat_59587ce) =
+  (* pattern "[^\\\\'\\n]+" *) token env tok
 
-let map_binaryop (env : env) (x : CST.binaryop) =
-  (match x with
-  | `STAR tok -> (* "*" *) token env tok
-  | `SLASH tok -> (* "/" *) token env tok
-  | `PERC tok -> (* "%" *) token env tok
-  | `PLUS tok -> (* "+" *) token env tok
-  | `DASH tok -> (* "-" *) token env tok
-  | `LTLT tok -> (* "<<" *) token env tok
-  | `GTGT tok -> (* ">>" *) token env tok
-  | `LT tok -> (* "<" *) token env tok
-  | `LTEQ tok -> (* "<=" *) token env tok
-  | `GT tok -> (* ">" *) token env tok
-  | `GTEQ tok -> (* ">=" *) token env tok
-  | `EQEQ tok -> (* "==" *) token env tok
-  | `BANGEQ tok -> (* "!=" *) token env tok
-  | `AMP tok -> (* "&" *) token env tok
-  | `HAT tok -> (* "^" *) token env tok
-  | `BAR tok -> (* "|" *) token env tok
-  | `AMPAMP tok -> (* "&&" *) token env tok
-  | `BARBAR tok -> (* "||" *) token env tok
-  )
-
-let map_string_start (env : env) (tok : CST.string_start) =
-  (* string_start *) token env tok
-
-let map_string_content (env : env) (tok : CST.string_content) =
-  (* string_content *) token env tok
+let map_string_end (env : env) (tok : CST.string_end) =
+  (* string_end *) token env tok
 
 let map_unaryop (env : env) (x : CST.unaryop) =
   (match x with
@@ -61,15 +39,6 @@ let map_unaryop (env : env) (x : CST.unaryop) =
   | `BANG tok -> (* "!" *) token env tok
   | `TILDE tok -> (* "~" *) token env tok
   )
-
-let map_imm_tok_prec_p1_pat_59587ce (env : env) (tok : CST.imm_tok_prec_p1_pat_59587ce) =
-  (* pattern "[^\\\\'\\n]+" *) token env tok
-
-let map_string_end (env : env) (tok : CST.string_end) =
-  (* string_end *) token env tok
-
-let map_escape_sequence (env : env) (tok : CST.escape_sequence) =
-  (* escape_sequence *) token env tok
 
 let map_imm_tok_prec_p1_pat_c7f65b4 (env : env) (tok : CST.imm_tok_prec_p1_pat_c7f65b4) =
   (* pattern "[^\\\\\"\\n]+" *) token env tok
@@ -80,6 +49,15 @@ let map_h (env : env) (x : CST.h) =
   | `COLONCOLON tok -> (* "::" *) token env tok
   | `COLONCOLONCOLON tok -> (* ":::" *) token env tok
   )
+
+let map_string_start (env : env) (tok : CST.string_start) =
+  (* string_start *) token env tok
+
+let map_id (env : env) (tok : CST.id) =
+  (* pattern [_a-zA-Z][_a-zA-Z0-9]* *) token env tok
+
+let map_string_content (env : env) (tok : CST.string_content) =
+  (* string_content *) token env tok
 
 let map_str_single (env : env) (xs : CST.str_single) =
   List.map (fun x ->
@@ -205,6 +183,88 @@ and map_assert_ (env : env) ((v1, v2, v3) : CST.assert_) =
   in
   todo env (v1, v2, v3)
 
+and map_binary_expr (env : env) (x : CST.binary_expr) =
+  (match x with
+  | `Expr_choice_STAR_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 =
+        (match v2 with
+        | `STAR tok -> (* "*" *) token env tok
+        | `SLASH tok -> (* "/" *) token env tok
+        | `PERC tok -> (* "%" *) token env tok
+        )
+      in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_choice_PLUS_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 =
+        (match v2 with
+        | `PLUS tok -> (* "+" *) token env tok
+        | `DASH tok -> (* "-" *) token env tok
+        )
+      in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_choice_LTLT_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 =
+        (match v2 with
+        | `LTLT tok -> (* "<<" *) token env tok
+        | `GTGT tok -> (* ">>" *) token env tok
+        )
+      in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_choice_LT_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 =
+        (match v2 with
+        | `LT tok -> (* "<" *) token env tok
+        | `LTEQ tok -> (* "<=" *) token env tok
+        | `GT tok -> (* ">" *) token env tok
+        | `GTEQ tok -> (* ">=" *) token env tok
+        )
+      in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_choice_EQEQ_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 =
+        (match v2 with
+        | `EQEQ tok -> (* "==" *) token env tok
+        | `BANGEQ tok -> (* "!=" *) token env tok
+        )
+      in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_AMP_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 = (* "&" *) token env v2 in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_HAT_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 = (* "^" *) token env v2 in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_BAR_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 = (* "|" *) token env v2 in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_AMPAMP_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 = (* "&&" *) token env v2 in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  | `Expr_BARBAR_expr (v1, v2, v3) ->
+      let v1 = map_document env v1 in
+      let v2 = (* "||" *) token env v2 in
+      let v3 = map_document env v3 in
+      todo env (v1, v2, v3)
+  )
+
 and map_bind (env : env) (x : CST.bind) =
   (match x with
   | `Id_EQ_expr x -> map_named_argument env x
@@ -242,9 +302,8 @@ and map_expr (env : env) (x : CST.expr) =
   | `False tok -> (* "false" *) token env tok
   | `Self tok -> (* "self" *) token env tok
   | `Dollar tok -> (* "$" *) token env tok
-  | `Num tok -> (* number *) token env tok
-  | `Super tok -> (* "super" *) token env tok
   | `Str x -> map_string_ env x
+  | `Num tok -> (* number *) token env tok
   | `LCURL_opt_choice_member_rep_COMMA_member_opt_COMMA_RCURL (v1, v2, v3) ->
       let v1 = (* "{" *) token env v1 in
       let v2 =
@@ -347,7 +406,7 @@ and map_expr (env : env) (x : CST.expr) =
       let v3 = map_document env v3 in
       let v4 = (* "]" *) token env v4 in
       todo env (v1, v2, v3, v4)
-  | `Expr_LPAR_opt_args_RPAR (v1, v2, v3, v4) ->
+  | `Expr_LPAR_opt_args_RPAR_opt_tail (v1, v2, v3, v4, v5) ->
       let v1 = map_document env v1 in
       let v2 = (* "(" *) token env v2 in
       let v3 =
@@ -356,7 +415,12 @@ and map_expr (env : env) (x : CST.expr) =
         | None -> todo env ())
       in
       let v4 = (* ")" *) token env v4 in
-      todo env (v1, v2, v3, v4)
+      let v5 =
+        (match v5 with
+        | Some tok -> (* "tailstrict" *) token env tok
+        | None -> todo env ())
+      in
+      todo env (v1, v2, v3, v4, v5)
   | `Id tok ->
       (* pattern [_a-zA-Z][_a-zA-Z0-9]* *) token env tok
   | `Local_bind (v1, v2, v3, v4, v5) ->
@@ -386,11 +450,7 @@ and map_expr (env : env) (x : CST.expr) =
         | None -> todo env ())
       in
       todo env (v1, v2, v3, v4, v5)
-  | `Expr_bina_expr (v1, v2, v3) ->
-      let v1 = map_document env v1 in
-      let v2 = map_binaryop env v2 in
-      let v3 = map_document env v3 in
-      todo env (v1, v2, v3)
+  | `Bin_expr x -> map_binary_expr env x
   | `Unar_expr (v1, v2) ->
       let v1 = map_unaryop env v1 in
       let v2 = map_document env v2 in

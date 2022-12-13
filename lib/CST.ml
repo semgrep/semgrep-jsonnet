@@ -8,38 +8,16 @@
 open! Sexplib.Conv
 open Tree_sitter_run
 
+type escape_sequence = Token.t
+[@@deriving sexp_of]
+
 type number = Token.t
 [@@deriving sexp_of]
 
-type id = Token.t (* pattern [_a-zA-Z][_a-zA-Z0-9]* *)
+type imm_tok_prec_p1_pat_59587ce = Token.t (* pattern "[^\\\\'\\n]+" *)
 [@@deriving sexp_of]
 
-type binaryop = [
-    `STAR of Token.t (* "*" *)
-  | `SLASH of Token.t (* "/" *)
-  | `PERC of Token.t (* "%" *)
-  | `PLUS of Token.t (* "+" *)
-  | `DASH of Token.t (* "-" *)
-  | `LTLT of Token.t (* "<<" *)
-  | `GTGT of Token.t (* ">>" *)
-  | `LT of Token.t (* "<" *)
-  | `LTEQ of Token.t (* "<=" *)
-  | `GT of Token.t (* ">" *)
-  | `GTEQ of Token.t (* ">=" *)
-  | `EQEQ of Token.t (* "==" *)
-  | `BANGEQ of Token.t (* "!=" *)
-  | `AMP of Token.t (* "&" *)
-  | `HAT of Token.t (* "^" *)
-  | `BAR of Token.t (* "|" *)
-  | `AMPAMP of Token.t (* "&&" *)
-  | `BARBAR of Token.t (* "||" *)
-]
-[@@deriving sexp_of]
-
-type string_start = Token.t
-[@@deriving sexp_of]
-
-type string_content = Token.t
+type string_end = Token.t
 [@@deriving sexp_of]
 
 type unaryop = [
@@ -50,15 +28,6 @@ type unaryop = [
 ]
 [@@deriving sexp_of]
 
-type imm_tok_prec_p1_pat_59587ce = Token.t (* pattern "[^\\\\'\\n]+" *)
-[@@deriving sexp_of]
-
-type string_end = Token.t
-[@@deriving sexp_of]
-
-type escape_sequence = Token.t
-[@@deriving sexp_of]
-
 type imm_tok_prec_p1_pat_c7f65b4 = Token.t (* pattern "[^\\\\\"\\n]+" *)
 [@@deriving sexp_of]
 
@@ -67,6 +36,15 @@ type h = [
   | `COLONCOLON of Token.t (* "::" *)
   | `COLONCOLONCOLON of Token.t (* ":::" *)
 ]
+[@@deriving sexp_of]
+
+type string_start = Token.t
+[@@deriving sexp_of]
+
+type id = Token.t (* pattern [_a-zA-Z][_a-zA-Z0-9]* *)
+[@@deriving sexp_of]
+
+type string_content = Token.t
 [@@deriving sexp_of]
 
 type str_single =
@@ -137,6 +115,48 @@ and assert_ = (
   * (Token.t (* ":" *) * document) option
 )
 
+and binary_expr = [
+    `Expr_choice_STAR_expr of (
+        document
+      * [
+            `STAR of Token.t (* "*" *)
+          | `SLASH of Token.t (* "/" *)
+          | `PERC of Token.t (* "%" *)
+        ]
+      * document
+    )
+  | `Expr_choice_PLUS_expr of (
+        document
+      * [ `PLUS of Token.t (* "+" *) | `DASH of Token.t (* "-" *) ]
+      * document
+    )
+  | `Expr_choice_LTLT_expr of (
+        document
+      * [ `LTLT of Token.t (* "<<" *) | `GTGT of Token.t (* ">>" *) ]
+      * document
+    )
+  | `Expr_choice_LT_expr of (
+        document
+      * [
+            `LT of Token.t (* "<" *)
+          | `LTEQ of Token.t (* "<=" *)
+          | `GT of Token.t (* ">" *)
+          | `GTEQ of Token.t (* ">=" *)
+        ]
+      * document
+    )
+  | `Expr_choice_EQEQ_expr of (
+        document
+      * [ `EQEQ of Token.t (* "==" *) | `BANGEQ of Token.t (* "!=" *) ]
+      * document
+    )
+  | `Expr_AMP_expr of (document * Token.t (* "&" *) * document)
+  | `Expr_HAT_expr of (document * Token.t (* "^" *) * document)
+  | `Expr_BAR_expr of (document * Token.t (* "|" *) * document)
+  | `Expr_AMPAMP_expr of (document * Token.t (* "&&" *) * document)
+  | `Expr_BARBAR_expr of (document * Token.t (* "||" *) * document)
+]
+
 and bind = [
     `Id_EQ_expr of named_argument
   | `Id_LPAR_opt_params_RPAR_EQ_expr of (
@@ -160,9 +180,8 @@ and expr = [
   | `False of Token.t (* "false" *)
   | `Self of Token.t (* "self" *)
   | `Dollar of Token.t (* "$" *)
-  | `Num of number (*tok*)
-  | `Super of Token.t (* "super" *)
   | `Str of string_
+  | `Num of number (*tok*)
   | `LCURL_opt_choice_member_rep_COMMA_member_opt_COMMA_RCURL of (
         Token.t (* "{" *)
       * objinside option
@@ -204,11 +223,12 @@ and expr = [
         Token.t (* "super" *) * Token.t (* "[" *) * document
       * Token.t (* "]" *)
     )
-  | `Expr_LPAR_opt_args_RPAR of (
+  | `Expr_LPAR_opt_args_RPAR_opt_tail of (
         document
       * Token.t (* "(" *)
       * args option
       * Token.t (* ")" *)
+      * Token.t (* "tailstrict" *) option
     )
   | `Id of id (*tok*)
   | `Local_bind of (
@@ -225,7 +245,7 @@ and expr = [
       * document
       * (Token.t (* "else" *) * document) option
     )
-  | `Expr_bina_expr of (document * binaryop * document)
+  | `Bin_expr of binary_expr
   | `Unar_expr of (unaryop * document)
   | `Expr_LCURL_choice_member_rep_COMMA_member_opt_COMMA_RCURL of (
         document * Token.t (* "{" *) * objinside * Token.t (* "}" *)
@@ -312,31 +332,34 @@ and params = (
 type true_ (* inlined *) = Token.t (* "true" *)
 [@@deriving sexp_of]
 
-type double (* inlined *) = Token.t (* "\"" *)
-[@@deriving sexp_of]
-
-type null (* inlined *) = Token.t (* "null" *)
-[@@deriving sexp_of]
-
-type dollar (* inlined *) = Token.t (* "$" *)
-[@@deriving sexp_of]
-
 type self (* inlined *) = Token.t (* "self" *)
-[@@deriving sexp_of]
-
-type super (* inlined *) = Token.t (* "super" *)
 [@@deriving sexp_of]
 
 type local (* inlined *) = Token.t (* "local" *)
 [@@deriving sexp_of]
 
+type comment (* inlined *) = Token.t
+[@@deriving sexp_of]
+
+type super (* inlined *) = Token.t (* "super" *)
+[@@deriving sexp_of]
+
+type double (* inlined *) = Token.t (* "\"" *)
+[@@deriving sexp_of]
+
 type single (* inlined *) = Token.t (* "'" *)
+[@@deriving sexp_of]
+
+type tailstrict (* inlined *) = Token.t (* "tailstrict" *)
+[@@deriving sexp_of]
+
+type null (* inlined *) = Token.t (* "null" *)
 [@@deriving sexp_of]
 
 type false_ (* inlined *) = Token.t (* "false" *)
 [@@deriving sexp_of]
 
-type comment (* inlined *) = Token.t
+type dollar (* inlined *) = Token.t (* "$" *)
 [@@deriving sexp_of]
 
 type importstr (* inlined *) = (Token.t (* "importstr" *) * string_)
