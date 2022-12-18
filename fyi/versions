@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-jsonnet/LICENSE
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 768a384989391237c6d55ff3d878a0d1e0d2b4fa
+Latest commit in repo: 11796bddddaa25d12166f76afe1d7f26594892ef
 Last change in file:
   commit f4e2d85598cdf43259b68bb396910d3c2b519de3
   Author: pad <pad@r2c.dev>
@@ -15,22 +15,20 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-jsonnet/grammar.js
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 768a384989391237c6d55ff3d878a0d1e0d2b4fa
+Latest commit in repo: 11796bddddaa25d12166f76afe1d7f26594892ef
 Last change in file:
-  commit 768a384989391237c6d55ff3d878a0d1e0d2b4fa
-  Author: Yoann Padioleau <pad@r2c.dev>
-  Date:   Tue Dec 13 17:25:22 2022 +0100
+  commit 11796bddddaa25d12166f76afe1d7f26594892ef
+  Author: pad <pad@r2c.dev>
+  Date:   Thu Dec 15 13:49:12 2022 +0100
   
-      Fix operator precedence (#10)
-      
-      Followed the official spec for the precedence values.
+      Fix priority of application vs unary
       
       test plan:
       make test
 ---
 File: semgrep-grammars/src/semgrep-jsonnet/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 386845ed490c63ab666dcbc27c5d27cb877dfe84
+Latest commit in repo: 1b5570d9d7b6ac081eb61807773aa5bb128d5f2a
 Last change in file:
   commit 8a6a3fc90c51d1de7d8505591f35ba37587d0c4e
   Author: pad <pad@r2c.dev>
