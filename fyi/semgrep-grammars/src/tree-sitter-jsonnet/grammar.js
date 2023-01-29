@@ -4,6 +4,7 @@ const PREC = {
     // The order is reversed though: In the spec, '1' means high priority
     // but with tree-sitter it means low priority.
     application_indexing: 13,
+    //TODO:
     unary: 12,
     multiplicative: 11,
     additive: 10,
@@ -24,7 +25,7 @@ module.exports = grammar({
     name: "jsonnet",
     extras: ($) => [/\s/, $.comment],
     externals: ($) => [$._string_start, $._string_content, $._string_end],
-    word: $ => $.id,
+    word: $ => $._ident,
     inline: ($) => [$.h, $.objinside],
     conflicts: () => [],
 
@@ -59,11 +60,8 @@ module.exports = grammar({
                         optional($.compspec),
                         "]"
                     ),
-                    prec(PREC.application_indexing,
-                      seq($.expr, ".", $.id)),
-                    seq($.super, ".", $.id),
-                    prec(PREC.application_indexing,
-                      seq(
+                    prec(PREC.application_indexing, seq($.expr, ".", $.id)),
+                    seq(
                         $.expr,
                         "[",
                         optional($.expr),
@@ -75,10 +73,10 @@ module.exports = grammar({
                             )
                         ),
                         "]"
-                      )),
+                    ),
+                    seq($.super, ".", $.id),
                     seq($.super, "[", $.expr, "]"),
-                    prec(PREC.application_indexing,
-                        seq($.expr, "(", optional($.args), ")", optional($.tailstrict))),
+                    seq($.expr, "(", optional($.args), ")", optional($.tailstrict)),
                     $.id,
                     $.local_bind,
                     prec.right(seq(
@@ -89,7 +87,7 @@ module.exports = grammar({
                         optional(seq("else", field("alternative", $.expr)))
                     )),
                     $._binary_expr,
-                    prec(PREC.unary,
+                    prec.left(
                         seq(
                             field("operator", $.unaryop),
                             field("argument", $.expr)
@@ -110,20 +108,20 @@ module.exports = grammar({
         true: () => "true",
         false: () => "false",
 
-        // Keywords
+	// Keywords
         self: () => "self",
         dollar: () => "$",
         super: () => "super",
         local: () => "local",
-        tailstrict: () => "tailstrict",
-
-        _binary_expr: ($) => {
+	tailstrict: () => "tailstrict",
+	
+	_binary_expr: ($) => {
            const table = [
                [PREC.multiplicative, choice("*", "/", "%")],
                [PREC.additive, choice("+", "-")],
                [PREC.bitshift, choice("<<", ">>")],
                [PREC.comparison, choice("<", "<=", ">", ">=")],
-               [PREC.equality, choice("==", "!=")],
+	       [PREC.equality, choice("==", "!=")],
                [PREC.bitand, '&'],
                [PREC.bitxor, '^'],
                [PREC.bitor, '|'],
@@ -140,7 +138,7 @@ module.exports = grammar({
         },
 
         unaryop: () => choice("-", "+", "!", "~"),
-
+	
         local_bind: ($) =>
             prec.right(seq($.local, commaSep1($.bind, false), ";", $.expr)),
 
@@ -193,9 +191,9 @@ module.exports = grammar({
 
         h: () => choice(":", "::", ":::"),
 
-        // assert in objects
+	// assert in objects
         assert: ($) => seq("assert", $.expr, optional(seq(":", $.expr))),
-
+	
         objlocal: ($) => seq($.local, $.bind),
 
         compspec: ($) => repeat1(choice($.forspec, $.ifspec)),
@@ -242,8 +240,12 @@ module.exports = grammar({
                 )
             ),
         named_argument: ($) => seq($.id, "=", $.expr),
-
-        id: () => /[_a-zA-Z][_a-zA-Z0-9]*/,
+        id: ($) => $._ident,
+	// This use of an intermediate rule for identifiers is to
+	// overcome some limitations in ocaml-tree-sitter-semgrep.
+	// Indeed, ocaml-tree-sitter-semgrep can't override terminals (here was id)
+	// that are also mentioned in the 'word:' directive.
+        _ident: () => /[_a-zA-Z][_a-zA-Z0-9]*/,
 
         // COPIED FROM: tree-sitter-json
         number: () => {
