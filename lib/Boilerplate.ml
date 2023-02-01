@@ -395,6 +395,11 @@ and map_expr (env : env) (x : CST.expr) =
           let v2 = (* "." *) token env v2 in
           let v3 = map_id env v3 in
           todo env (v1, v2, v3)
+      | `Super_DOT_id (v1, v2, v3) ->
+          let v1 = (* "super" *) token env v1 in
+          let v2 = (* "." *) token env v2 in
+          let v3 = map_id env v3 in
+          todo env (v1, v2, v3)
       | `Expr_LBRACK_opt_expr_opt_COLON_opt_expr_opt_COLON_opt_expr_RBRACK (v1, v2, v3, v4, v5) ->
           let v1 = map_document env v1 in
           let v2 = (* "[" *) token env v2 in
@@ -429,11 +434,6 @@ and map_expr (env : env) (x : CST.expr) =
           in
           let v5 = (* "]" *) token env v5 in
           todo env (v1, v2, v3, v4, v5)
-      | `Super_DOT_id (v1, v2, v3) ->
-          let v1 = (* "super" *) token env v1 in
-          let v2 = (* "." *) token env v2 in
-          let v3 = map_id env v3 in
-          todo env (v1, v2, v3)
       | `Super_LBRACK_expr_RBRACK (v1, v2, v3, v4) ->
           let v1 = (* "super" *) token env v1 in
           let v2 = (* "[" *) token env v2 in

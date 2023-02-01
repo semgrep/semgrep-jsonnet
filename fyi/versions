@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-jsonnet/LICENSE
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 43155d919c277eb41bf3a7975f580980945fd004
+Latest commit in repo: 9ed7792cfa72cc463c1582d3604a8d0b4ed9a6be
 Last change in file:
   commit f4e2d85598cdf43259b68bb396910d3c2b519de3
   Author: pad <pad@r2c.dev>
@@ -15,20 +15,17 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-jsonnet/grammar.js
 Git repo name: tree-sitter-jsonnet
-Latest commit in repo: 43155d919c277eb41bf3a7975f580980945fd004
+Latest commit in repo: 9ed7792cfa72cc463c1582d3604a8d0b4ed9a6be
 Last change in file:
-  commit 43155d919c277eb41bf3a7975f580980945fd004
+  commit 9ed7792cfa72cc463c1582d3604a8d0b4ed9a6be
   Author: pad <pad@r2c.dev>
-  Date:   Sun Jan 29 18:51:46 2023 +0100
+  Date:   Wed Feb 1 15:15:47 2023 +0100
   
-      Add intermediate _ident to please ocaml-tree-sitter-semgrep
-      
-      test plan:
-      make
+      add intermediate ident
 ---
 File: semgrep-grammars/src/semgrep-jsonnet/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 7fd94add572c2bc67a98571b870a9082c37c7a91
+Latest commit in repo: a267bef57807980dd8704945b800651ccdf2621f
 Last change in file:
   commit 7fd94add572c2bc67a98571b870a9082c37c7a91
   Author: pad <pad@r2c.dev>

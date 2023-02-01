@@ -232,6 +232,7 @@ and expr = [
           * Token.t (* "]" *)
         )
       | `Expr_DOT_id of (document * Token.t (* "." *) * id)
+      | `Super_DOT_id of (Token.t (* "super" *) * Token.t (* "." *) * id)
       | `Expr_LBRACK_opt_expr_opt_COLON_opt_expr_opt_COLON_opt_expr_RBRACK of (
             document
           * Token.t (* "[" *)
@@ -244,7 +245,6 @@ and expr = [
               option
           * Token.t (* "]" *)
         )
-      | `Super_DOT_id of (Token.t (* "super" *) * Token.t (* "." *) * id)
       | `Super_LBRACK_expr_RBRACK of (
             Token.t (* "super" *) * Token.t (* "[" *) * document
           * Token.t (* "]" *)

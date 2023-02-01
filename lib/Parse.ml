@@ -409,6 +409,11 @@ let children_regexps : (string * Run.exp option) list = [
           Token (Name "id");
         ];
         Seq [
+          Token (Name "super");
+          Token (Literal ".");
+          Token (Name "id");
+        ];
+        Seq [
           Token (Name "expr");
           Token (Literal "[");
           Opt (
@@ -431,11 +436,6 @@ let children_regexps : (string * Run.exp option) list = [
             ];
           );
           Token (Literal "]");
-        ];
-        Seq [
-          Token (Name "super");
-          Token (Literal ".");
-          Token (Name "id");
         ];
         Seq [
           Token (Name "super");
@@ -1567,6 +1567,18 @@ and trans_expr ((kind, body) : mt) : CST.expr =
                   )
                 )
             | Alt (11, v) ->
+                `Super_DOT_id (
+                  (match v with
+                  | Seq [v0; v1; v2] ->
+                      (
+                        trans_super (Run.matcher_token v0),
+                        Run.trans_token (Run.matcher_token v1),
+                        trans_id (Run.matcher_token v2)
+                      )
+                  | _ -> assert false
+                  )
+                )
+            | Alt (12, v) ->
                 `Expr_LBRACK_opt_expr_opt_COLON_opt_expr_opt_COLON_opt_expr_RBRACK (
                   (match v with
                   | Seq [v0; v1; v2; v3; v4] ->
@@ -1608,18 +1620,6 @@ and trans_expr ((kind, body) : mt) : CST.expr =
                           v3
                         ,
                         Run.trans_token (Run.matcher_token v4)
-                      )
-                  | _ -> assert false
-                  )
-                )
-            | Alt (12, v) ->
-                `Super_DOT_id (
-                  (match v with
-                  | Seq [v0; v1; v2] ->
-                      (
-                        trans_super (Run.matcher_token v0),
-                        Run.trans_token (Run.matcher_token v1),
-                        trans_id (Run.matcher_token v2)
                       )
                   | _ -> assert false
                   )
