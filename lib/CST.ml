@@ -9,38 +9,28 @@ open! Sexplib.Conv
 open Tree_sitter_run
 
 type semgrep_metavariable = Token.t
-[@@deriving sexp_of]
 
 type string_start = Token.t
-[@@deriving sexp_of]
 
 type escape_sequence = Token.t
-[@@deriving sexp_of]
 
 type number = Token.t
-[@@deriving sexp_of]
 
 type ident = Token.t (* pattern [_a-zA-Z][_a-zA-Z0-9]* *)
-[@@deriving sexp_of]
 
 type string_content = Token.t
-[@@deriving sexp_of]
 
 type string_end = Token.t
-[@@deriving sexp_of]
 
 type imm_tok_prec_p1_pat_59587ce = Token.t (* pattern "[^\\\\'\\n]+" *)
-[@@deriving sexp_of]
 
 type h = [
     `COLON of Token.t (* ":" *)
   | `COLONCOLON of Token.t (* "::" *)
   | `COLONCOLONCOLON of Token.t (* ":::" *)
 ]
-[@@deriving sexp_of]
 
 type imm_tok_prec_p1_pat_c7f65b4 = Token.t (* pattern "[^\\\\\"\\n]+" *)
-[@@deriving sexp_of]
 
 type unaryop = [
     `DASH of Token.t (* "-" *)
@@ -48,13 +38,11 @@ type unaryop = [
   | `BANG of Token.t (* "!" *)
   | `TILDE of Token.t (* "~" *)
 ]
-[@@deriving sexp_of]
 
 type id = [
     `Id of ident (*tok*)
   | `Semg_meta of semgrep_metavariable (*tok*)
 ]
-[@@deriving sexp_of]
 
 type str_single =
   [
@@ -62,7 +50,6 @@ type str_single =
     | `Esc_seq of escape_sequence (*tok*)
   ]
     list (* one or more *)
-[@@deriving sexp_of]
 
 type str_double =
   [
@@ -70,7 +57,6 @@ type str_double =
     | `Esc_seq of escape_sequence (*tok*)
   ]
     list (* one or more *)
-[@@deriving sexp_of]
 
 type string_ = [
     `Opt_AT_single_single of (
@@ -102,13 +88,10 @@ type string_ = [
       * string_end (*tok*)
     )
 ]
-[@@deriving sexp_of]
 
 type importstr = (Token.t (* "importstr" *) * string_)
-[@@deriving sexp_of]
 
 type import = (Token.t (* "import" *) * string_)
-[@@deriving sexp_of]
 
 type anonymous_function = (
     Token.t (* "function" *)
@@ -358,49 +341,31 @@ and params = (
   * (Token.t (* "," *) * param) list (* zero or more *)
   * Token.t (* "," *) option
 )
-[@@deriving sexp_of]
 
 type null (* inlined *) = Token.t (* "null" *)
-[@@deriving sexp_of]
 
 type comment (* inlined *) = Token.t
-[@@deriving sexp_of]
 
 type double (* inlined *) = Token.t (* "\"" *)
-[@@deriving sexp_of]
 
 type self (* inlined *) = Token.t (* "self" *)
-[@@deriving sexp_of]
 
 type super (* inlined *) = Token.t (* "super" *)
-[@@deriving sexp_of]
 
 type local (* inlined *) = Token.t (* "local" *)
-[@@deriving sexp_of]
 
 type single (* inlined *) = Token.t (* "'" *)
-[@@deriving sexp_of]
 
 type semgrep_ellipsis (* inlined *) = Token.t (* "..." *)
-[@@deriving sexp_of]
 
 type tailstrict (* inlined *) = Token.t (* "tailstrict" *)
-[@@deriving sexp_of]
 
 type true_ (* inlined *) = Token.t (* "true" *)
-[@@deriving sexp_of]
 
 type false_ (* inlined *) = Token.t (* "false" *)
-[@@deriving sexp_of]
 
 type dollar (* inlined *) = Token.t (* "$" *)
-[@@deriving sexp_of]
 
 type deep_ellipsis (* inlined *) = (
     Token.t (* "<..." *) * document * Token.t (* "...>" *)
 )
-[@@deriving sexp_of]
-
-let dump_tree root =
-  sexp_of_document root
-  |> Print_sexp.to_stdout
