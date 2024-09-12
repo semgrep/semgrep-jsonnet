@@ -369,3 +369,7 @@ type dollar (* inlined *) = Token.t (* "$" *)
 type deep_ellipsis (* inlined *) = (
     Token.t (* "<..." *) * document * Token.t (* "...>" *)
 )
+
+type extra = Comment of Loc.t * comment
+
+type extras = extra list
