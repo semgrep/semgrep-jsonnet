@@ -879,7 +879,7 @@ let dump_tree root =
 
 let map_extra (env : env) (x : CST.extra) =
   match x with
-  | Comment (_loc, x) -> ("comment", "comment", map_comment env x)
+  | `Comment (_loc, x) -> ("comment", "comment", map_comment env x)
 
 let dump_extras (extras : CST.extras) =
   List.iter (fun extra ->
